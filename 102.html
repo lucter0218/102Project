@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>102</title>
+    <link rel="icon" href="/asstes/icon.png">
+    <link rel="apple-touch-icon" href="/asstes/icon.png">
+	<script>
+		function getCurrentDate() {
+			const currentDate = new Date();
+			const year = currentDate.getFullYear();
+			const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+			const day = String(currentDate.getDate()).padStart(2, '0');
+			const dateString = `${year}${month}${day}`;
+			const url = `https://open.neis.go.kr/hub/misTimetable?KEY=f5c7c054cea74f39a558c93eaac954a5&Type=JSON&pIndex=1&pSize=100&ATPT_OFCDC_SC_CODE=E10&SD_SCHUL_CODE=7361310&GRADE=1&CLASS_NM=2&AY=2023&ALL_TI_YMD=${dateString}`;
+			const xhr = new XMLHttpRequest();
+				xhr.open("GET", url, true);
+				xhr.send();
+				xhr.onreadystatechange = function() {
+					if (xhr.readyState === XMLHttpRequest.DONE) {
+						if (xhr.status === 200) {
+						// JSON 파싱
+						const json = JSON.parse(xhr.responseText);
+						const timetable = json.misTimetable[1].row;
+						
+						// 결과를 출력할 요소 가져오기
+						const outputElement = document.getElementById("output");
+						
+						// 각 교시별 과목 출력
+						timetable.forEach((lesson) => {
+							const lessonElement = document.createElement("p");
+							lessonElement.textContent = `${lesson.PERIO}교시 | ${lesson.ITRT_CNTNT}`;
+							outputElement.appendChild(lessonElement);
+						});
+					} else {
+						console.error(xhr.statusText);
+					}
+				}
+			};
+		}
+		window.onload = function() {
+			getCurrentDate();
+		}
+	</script>
+	<script
+	src="https://code.jquery.com/jquery-3.6.4.js"
+	integrity="sha256-a9jBBRygX1Bh5lt8GZjXDzyOB+bWve9EiO7tROUtj/E="
+	crossorigin="anonymous"></script>
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@100;300;400;500;700;900&display=swap" rel="stylesheet">
+    <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-storage.js"></script>
+
+    <script>
+    var firebaseConfig = {
+        apiKey: "AIzaSyCKQDfgEhraBjE8iqqpk4pVjvMYRTVxD3U",
+        authDomain: "project102-kr.firebaseapp.com",
+        databaseURL: "https://project102-kr-default-rtdb.firebaseio.com",
+        projectId: "project102-kr",
+        storageBucket: "project102-kr.appspot.com",
+        messagingSenderId: "547077991353",
+        appId: "1:547077991353:web:6efe0d702bc1f4f5a82468"
+    };
+    firebase.initializeApp(firebaseConfig);
+    </script>
+    <script>
+        const db = firebase.firestore();
+        db.collection('posts').orderBy('날짜', "desc").get().then((snapshot)=>{
+            snapshot.forEach((doc)=>{
+                console.log(doc.data())
+                var templete = `<div class="product">
+          <div class="thumbnail" style="background-image: url('${doc.data().이미지}')"></div>
+          <div class="flex-grow-1 p-4">
+            <h5 class="title">${doc.data().제목}</h5>
+            <p class="date">${doc.data().날짜.toDate()}</p>
+            <p class="content">${doc.data().내용}</p>
+          </div>
+        </div>`
+      $('.container').append(templete)
+            })
+        })
+    </script>
+	<style>
+		body {
+			font-family: 'Noto Sans KR', sans-serif;
+		}
+		*{font-family: 'Noto Sans KR', serif;}
+	h2{font-weight : 900;}
+	p{font-weight : 300;}
+	</style>
+    <link href="style.css" rel="stylesheet">
+</head>
+<body>
+    
+<nav class="bg-white border-gray-200 dark:bg-gray-900 shadow-lg">
+    <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
+      <a href="/#" class="flex items-center">
+          <img src="asstes/102.png" class="h-8 mr-3" alt="Flowbite Logo" />
+      </a>
+      <button data-collapse-toggle="navbar-default" type="button" class="inline-flex items-center p-2 ml-3 text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-gray-400 dark:hover:bg-gray-700 dark:focus:ring-gray-600" aria-controls="navbar-default" aria-expanded="false">
+        <span class="sr-only">Open main menu</span>
+        <svg class="w-6 h-6" aria-hidden="true" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path></svg>
+      </button>
+      <div class="hidden w-full md:block md:w-auto" id="navbar-default">
+      </div>
+    </div>
+  </nav>
+
+  <div class=" mx-auto max-w-screen-xl lg:py-16">
+    <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">제목</label>
+    <input type="text" id="title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+    <br>
+    <label for="first_name" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">내용</label>
+    <input type="text" id="content" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" required>
+    <br>
+    <label class="block mb-2 text-sm font-medium text-gray-900 dark:text-white" for="file_input">Upload file</label>
+<input class="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 dark:text-gray-400 focus:outline-none dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400" aria-describedby="file_input_help" id="image" type="file">
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">SVG, PNG, JPG or GIF (MAX. 800x400px).</p>
+<p class="mt-1 text-sm text-gray-500 dark:text-gray-300" id="file_input_help">사진 첨부를 안하면 게시글을 업로드 할 수 없는 오류가 있습니다. 버튼을 눌러 랜덤 사진을 다운로드 받으시고 글에 첨부해주세요.</p>
+<br>
+<button class="bg-black hover:bg-gray-900 text-white font-bold py-2 px-4 rounded-full" id='send';>
+    Upload
+</button>
+<button class="bg-black hover:bg-gray-900 text-white font-bold py-2 px-4 rounded-full" onclick="downloadRandomImage()">
+  랜덤 사진
+</button>
+</div>
+    <div class="container mx-auto max-w-screen-xl lg:py-16">
+      </div>
+
+      <script>
+        const storage = firebase.storage();
+
+        $('#send').click(function(){
+
+            var file = document.querySelector('#image').files[0];
+            var storageRef = storage.ref();
+            var 경로 = storageRef.child('image/' + file.name);
+            var 작업 = 경로.put(file)
+
+            작업.on( 'state_changed', 
+    // 변화시 동작하는 함수 
+    null, 
+    //에러시 동작하는 함수
+    (error) => {
+      console.error('실패사유는', error);
+    }, 
+    // 성공시 동작하는 함수
+    () => {
+      작업.snapshot.ref.getDownloadURL().then((url) => {
+        console.log('업로드된 경로는', url);
+        var 저장 = {
+                '제목' : $('#title').val(),
+                '내용' : $('#content').val(),
+                '날짜' : new Date(),
+                '이미지' : url
+            }
+            db.collection('posts').add(저장).then((result)=>{
+                console.log(result)
+                window.location.href = "102.html"
+            }).catch((err)=>{
+                console.log(err)
+            })
+        })
+      });
+    }
+);
+      </script>
+      <script>
+        function downloadRandomImage() {
+          const min = 0;
+          const max = 6;
+          const randomNumber = Math.floor(Math.random() * (max - min + 1)) + min; // 0부터 6까지 랜덤한 숫자 생성
+          const filename = `${randomNumber}.jpg`; // 랜덤한 파일명 생성
+          
+          const link = document.createElement('a'); // 다운로드 링크 생성
+          link.download = filename; // 파일명 설정
+          link.href = `random/${filename}`; // 파일 경로 설정
+          document.body.appendChild(link); // 링크 추가
+          link.click(); // 다운로드 실행
+          document.body.removeChild(link); // 링크 제거
+        }
+      </script>
+</body>
+</html>
